@@ -1,2 +1,2 @@
 # flask-messages-api
-API backend system that is responsible for handling messages between users.
+API backend system for handling messages between users.
