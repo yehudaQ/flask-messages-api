@@ -32,28 +32,27 @@ def login():
 
 @auth.route("/sign-up", methods=['POST'])
 def sign_up():
-    if request.method == 'POST':
-        email = request.form.get("email")
-        password1 = request.form.get("password1")
-        password2 = request.form.get("password2")
+    email = request.form.get("email")
+    password1 = request.form.get("password1")
+    password2 = request.form.get("password2")
 
-        email_exists = User.query.filter_by(email=email).first()
+    email_exists = User.query.filter_by(email=email).first()
 
-        if email_exists:
-            return 'Email is already in use.', 403
-        elif password1 != password2:
-            return 'Passwords don\'t match!', 403
-        elif len(password1) < 5:
-            return 'Password is too short.', 403
-        elif len(email) < 4:
-            return 'Email is invalid.', 403
-        else:
-            new_user = User(email=email, password=generate_password_hash(password1, method='sha256'))
-            db.session.add(new_user)
-            db.session.commit()
-            login_user(new_user, remember=True)
+    if email_exists:
+        return 'Email is already in use.', 403
+    elif password1 != password2:
+        return 'Passwords don\'t match!', 403
+    elif len(password1) < 5:
+        return 'Password is too short.', 403
+    elif len(email) < 4:
+        return 'Email is invalid.', 403
+    else:
+        new_user = User(email=email, password=generate_password_hash(password1, method='sha256'))
+        db.session.add(new_user)
+        db.session.commit()
+        login_user(new_user, remember=True)
 
-            return 'User successfully created.', 201
+        return 'User successfully created.', 201
 
 
 @auth.route("/logout", methods=['GET'])

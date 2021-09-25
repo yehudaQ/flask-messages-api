@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from os import path, remove
 from flask_login import LoginManager
+
 from app.core.utils import get_configs_as_dictionary
 
 db = SQLAlchemy()
@@ -19,9 +20,11 @@ def create_app():
 
     from app.api.views import views
     from app.api.auth.auth import auth
+    from app.api.message.views import message
 
     app.register_blueprint(views, url_prefix="/")
     app.register_blueprint(auth, url_prefix="/")
+    app.register_blueprint(message, url_prefix="/")
 
     from app.models.user import User
     from app.models.message import Message
