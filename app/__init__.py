@@ -43,10 +43,3 @@ def create_database(app):
     if not path.exists(f'app/{DB_NAME}'):
         db.create_all(app=app)
         print("Created database!")
-
-    # # TODO : Remove 'else' statement
-    # else:
-    #     remove("app/" + DB_NAME)
-    #     print("Database dropped!")
-    #     db.create_all(app=app)
-    #     print("Created database!")
