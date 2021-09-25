@@ -9,6 +9,3 @@ class Message(db.Model):
     creation_date = db.Column(db.DateTime, default=datetime.utcnow)
 
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    sender = db.relationship("User", backref="message")
-
-    receivedMsg = db.relationship("ReceivedMessage", backref='message', cascade="all")

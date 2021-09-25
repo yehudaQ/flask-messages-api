@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from os import path, remove
-
+from flask_login import LoginManager
 from app.core.utils import get_configs_as_dictionary
 
 db = SQLAlchemy()
@@ -18,24 +18,28 @@ def create_app():
     db.init_app(app)
 
     from app.api.views import views
+    from app.api.auth.auth import auth
+
     app.register_blueprint(views, url_prefix="/")
+    app.register_blueprint(auth, url_prefix="/")
 
     from app.models.user import User
-    from app.models.receivedMessage import ReceivedMessage
     from app.models.message import Message
+    from app.models.receivedMessage import ReceivedMessage
+
     create_database(app)
+
+    login_manager = LoginManager()
+    login_manager.init_app(app)
+
+    @login_manager.user_loader
+    def load_user(id):
+        return User.query.get(int(id))
 
     return app
 
 
 def create_database(app):
     if not path.exists(f'app/{DB_NAME}'):
-        db.create_all(app=app)
-        print("Created database!")
-
-    # TODO : Remove 'else' statment
-    else:
-        remove("app/" + DB_NAME)
-        print("Database dropped!")
         db.create_all(app=app)
         print("Created database!")
