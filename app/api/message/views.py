@@ -106,3 +106,19 @@ def get_or_delete_message(message_id):
 
     # ReceivedMessage type
     return jsonify(message.message.serialize), 200
+
+
+@message.route("/message/unread", methods=['GET'])
+@login_required
+def get_unread_messages():
+    received_messages = ReceivedMessage.query.filter_by(receiver_id=current_user.id, is_read=False).all()
+
+    return jsonify([msg.message.serialize for msg in received_messages]), 200
+
+
+@message.route("/message/read", methods=['GET'])
+@login_required
+def get_read_messages():
+    received_messages = ReceivedMessage.query.filter_by(receiver_id=current_user.id, is_read=True).all()
+
+    return jsonify([msg.message.serialize for msg in received_messages]), 200
