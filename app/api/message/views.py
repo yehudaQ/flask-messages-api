@@ -32,11 +32,11 @@ def messages():
 
         return 'Message successfully created.', 201
 
-    # GET method
+    # GET method - Retrieve all user's received messages
     user = User.query.filter_by(id=current_user.id).first()
     received_messages = user.received_messages
 
-    return jsonify([msg.serialize for msg in received_messages]), 200
+    return jsonify([received.message.serialize for received in received_messages]), 200
 
 
 @message.route("/message/sent", methods=['GET'])
@@ -46,3 +46,11 @@ def get_sent_messages():
     sent_messages = user.sent_messages
 
     return jsonify([msg.serialize for msg in sent_messages]), 200
+
+
+@message.route("/message/unread", methods=['GET'])
+@login_required
+def get_unread_messages():
+    received_messages = ReceivedMessage.query.filter_by(receiver_id=current_user.id, is_read=False).all()
+
+    return jsonify([received.message.serialize for received in received_messages]), 200

@@ -9,6 +9,7 @@ class Message(db.Model):
     creation_date = db.Column(db.DateTime, default=datetime.utcnow)
 
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    received_messages = db.relationship("ReceivedMessage", backref='message', cascade="all")
 
     @property
     def serialize(self):
