@@ -81,3 +81,28 @@ def unread_message(message_id):
 @login_required
 def read_message(message_id):
     return change_message_read_status(user_id=current_user.id, message_id=message_id, read_status=True)
+
+
+@message.route("/message/<int:message_id>", methods=['GET', 'DELETE'])
+@login_required
+def get_or_delete_message(message_id):
+    message = ReceivedMessage.query.filter_by(receiver_id=current_user.id, message_id=message_id).first()
+
+    if not message:
+        message = Message.query.filter_by(sender_id=current_user.id, id=message_id).first()
+
+    if not message:
+        return "Message not found.", 404
+
+    if request.method == 'DELETE':
+        db.session.delete(message)
+        db.session.commit()
+
+        return 'Message successfully deleted.', 200
+
+    # GET method
+    if type(message).__name__ == "Message":
+        return jsonify(message.serialize), 200
+
+    # ReceivedMessage type
+    return jsonify(message.message.serialize), 200
