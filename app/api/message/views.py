@@ -33,8 +33,11 @@ def messages():
         return 'Message successfully created.', 201
 
     # GET method - Retrieve all user's received messages
-    user = User.query.filter_by(id=current_user.id).first()
-    received_messages = user.received_messages
+    page = int(request.form.get("page", 1))
+    per_page = int(request.form.get("per_page", 10))
+    received_messages = ReceivedMessage.query.filter_by(receiver_id=current_user.id).paginate(page=page,
+                                                                                              per_page=per_page,
+                                                                                              error_out=False).items
 
     return jsonify([received.message.serialize for received in received_messages]), 200
 
@@ -42,8 +45,10 @@ def messages():
 @message.route("/message/sent", methods=['GET'])
 @login_required
 def get_sent_messages():
-    user = User.query.filter_by(id=current_user.id).first()
-    sent_messages = user.sent_messages
+    page = int(request.form.get("page", 1))
+    per_page = int(request.form.get("per_page", 10))
+    sent_messages = Message.query.filter_by(sender_id=current_user.id).paginate(page=page, per_page=per_page,
+                                                                                error_out=False).items
 
     return jsonify([msg.serialize for msg in sent_messages]), 200
 
@@ -111,7 +116,11 @@ def get_or_delete_message(message_id):
 @message.route("/message/unread", methods=['GET'])
 @login_required
 def get_unread_messages():
-    received_messages = ReceivedMessage.query.filter_by(receiver_id=current_user.id, is_read=False).all()
+    page = int(request.form.get("page", 1))
+    per_page = int(request.form.get("per_page", 10))
+    received_messages = ReceivedMessage.query.filter_by(receiver_id=current_user.id, is_read=False).paginate(page=page,
+                                                                                                             per_page=per_page,
+                                                                                                             error_out=False).items
 
     return jsonify([msg.message.serialize for msg in received_messages]), 200
 
@@ -119,6 +128,10 @@ def get_unread_messages():
 @message.route("/message/read", methods=['GET'])
 @login_required
 def get_read_messages():
-    received_messages = ReceivedMessage.query.filter_by(receiver_id=current_user.id, is_read=True).all()
+    page = int(request.form.get("page", 1))
+    per_page = int(request.form.get("per_page", 10))
+    received_messages = ReceivedMessage.query.filter_by(receiver_id=current_user.id, is_read=True).paginate(page=page,
+                                                                                                            per_page=per_page,
+                                                                                                            error_out=False).items
 
     return jsonify([msg.message.serialize for msg in received_messages]), 200
