@@ -54,3 +54,17 @@ def get_unread_messages():
     received_messages = ReceivedMessage.query.filter_by(receiver_id=current_user.id, is_read=False).all()
 
     return jsonify([received.message.serialize for received in received_messages]), 200
+
+
+@message.route("/message/read/<int:message_id>", methods=['PATCH'])
+@login_required
+def read_message(message_id):
+    receive_message = ReceivedMessage.query.filter_by(receiver_id=current_user.id, message_id=message_id).first()
+
+    if not message:
+        return "Message not found.", 404
+
+    message.is_read = True
+    db.session.commit()
+
+    return jsonify(receive_message.message.serialize), 200
