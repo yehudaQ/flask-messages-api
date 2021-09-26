@@ -9,3 +9,9 @@ class RegistrationForm(Form):
         validators.EqualTo('confirm_password', message='Passwords must match')
     ])
     confirm_password = PasswordField('confirm_password', [validators.DataRequired()])
+
+
+class MessageForm(Form):
+    receiver_email = StringField('receiver_email', [validators.Email()])
+    message = StringField('message', [validators.DataRequired(), validators.Length(min=1, max=250)])
+    subject = StringField('subject', [validators.DataRequired(), validators.Length(min=1, max=150)])

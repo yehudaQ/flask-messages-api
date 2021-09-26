@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
 
 from app import db
+from app.core.forms import MessageForm
 from app.models.message import Message
 from app.models.receivedMessage import ReceivedMessage
 from app.models.user import User
@@ -13,16 +14,16 @@ message = Blueprint("message", __name__)
 @login_required
 def messages():
     if request.method == 'POST':
-        receiver_email = request.form.get("receiver_email")
-        message = request.form.get("message")
-        subject = request.form.get("subject")
+        form = MessageForm(request.form)
+        if not form.validate():
+            return form.errors, 403
 
-        receiver = User.query.filter_by(email=receiver_email).first()
+        receiver = User.query.filter_by(email=form.receiver_email.data).first()
 
         if not receiver:
             return 'Receiver Email is not exists.', 403
 
-        new_message = Message(message=message, subject=subject, sender_id=current_user.id)
+        new_message = Message(message=form.message.data, subject=form.subject.data, sender_id=current_user.id)
         db.session.add(new_message)
         db.session.commit()
 

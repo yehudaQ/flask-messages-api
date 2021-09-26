@@ -4,7 +4,7 @@ from datetime import datetime
 
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    message = db.Column(db.String(255))
+    message = db.Column(db.String(250))
     subject = db.Column(db.String(150))
     creation_date = db.Column(db.DateTime, default=datetime.utcnow)
 
