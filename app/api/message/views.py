@@ -48,23 +48,36 @@ def get_sent_messages():
     return jsonify([msg.serialize for msg in sent_messages]), 200
 
 
-@message.route("/message/unread", methods=['GET'])
-@login_required
-def get_unread_messages():
-    received_messages = ReceivedMessage.query.filter_by(receiver_id=current_user.id, is_read=False).all()
+def change_message_read_status(user_id: str, message_id: str, read_status: bool) -> tuple:
+    """
+    Mark user received message as 'read' or 'unread'.
+    Args:
+        user_id (str): User ID.
+        message_id (str): Message ID.
+        read_status (bool): Message 'is_read' status.
 
-    return jsonify([received.message.serialize for received in received_messages]), 200
+    Returns:
+        tuple: message , status code.
+
+    """
+    received_message = ReceivedMessage.query.filter_by(receiver_id=user_id, message_id=message_id).first()
+
+    if not received_message:
+        return "Message not found.", 404
+
+    received_message.is_read = read_status
+    db.session.commit()
+
+    return jsonify(received_message.message.serialize), 200
+
+
+@message.route("/message/unread/<int:message_id>", methods=['PATCH'])
+@login_required
+def unread_message(message_id):
+    return change_message_read_status(user_id=current_user.id, message_id=message_id, read_status=False)
 
 
 @message.route("/message/read/<int:message_id>", methods=['PATCH'])
 @login_required
 def read_message(message_id):
-    receive_message = ReceivedMessage.query.filter_by(receiver_id=current_user.id, message_id=message_id).first()
-
-    if not message:
-        return "Message not found.", 404
-
-    message.is_read = True
-    db.session.commit()
-
-    return jsonify(receive_message.message.serialize), 200
+    return change_message_read_status(user_id=current_user.id, message_id=message_id, read_status=True)
