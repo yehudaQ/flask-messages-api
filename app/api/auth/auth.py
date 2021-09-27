@@ -1,9 +1,10 @@
 from flask import Blueprint, request
 from flask_login import login_user, logout_user, login_required, current_user
+from werkzeug.datastructures import ImmutableMultiDict
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from app import db
-from app.core.forms import RegistrationForm
+from app.core.forms import RegistrationForm, LoginForm
 from app.models.user import User
 
 auth = Blueprint("auth", __name__)
@@ -14,11 +15,13 @@ def login():
     # TODO : Handle response Status Codes
     # TODO : Request data format
     if request.method == 'POST':
-        email = request.form.get("email")
-        password = request.form.get("password")
-        user = User.query.filter_by(email=email).first()
+        form = LoginForm(ImmutableMultiDict(request.get_json()))
+        if not form.validate():
+            return form.errors, 403
+
+        user = User.query.filter_by(email=form.email.data).first()
         if user:
-            if check_password_hash(user.password, password):
+            if check_password_hash(user.password, form.password.data):
                 login_user(user, remember=True)
                 return "Logged in!", 200
             else:
@@ -32,7 +35,7 @@ def login():
 
 @auth.route("/sign-up", methods=['POST'])
 def sign_up():
-    form = RegistrationForm(request.form)
+    form = RegistrationForm(ImmutableMultiDict(request.get_json()))
     if not form.validate():
         return form.errors, 403
 

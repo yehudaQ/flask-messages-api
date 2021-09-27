@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
+from werkzeug.datastructures import ImmutableMultiDict
 
 from app import db
 from app.core.forms import MessageForm
@@ -13,7 +14,7 @@ message = Blueprint("message", __name__)
 @message.route("/message", methods=['POST'])
 @login_required
 def post_message():
-    form = MessageForm(request.form)
+    form = MessageForm(ImmutableMultiDict(request.get_json()))
     if not form.validate():
         return form.errors, 403
 
