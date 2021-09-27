@@ -1,4 +1,4 @@
 from app import create_app
 
-app = create_app()
-app.run()
+messages_app = create_app()
+messages_app.run()
