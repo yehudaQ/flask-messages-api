@@ -24,10 +24,10 @@ def login():
             if check_password_hash(user.password, form.password.data):
                 login_user(user, remember=True)
                 return "Logged in!", 200
-            else:
-                return 'Password is incorrect!', 401
-        else:
-            return 'Email does not exist!', 401
+
+            return 'Password is incorrect!', 401
+
+        return 'Email does not exist!', 401
 
     # Get method
     return str(current_user), 200
@@ -43,13 +43,13 @@ def sign_up():
 
     if email_exists:
         return 'Email is already in use.', 403
-    else:
-        new_user = User(email=form.email.data, password=generate_password_hash(form.password.data, method='sha256'))
-        db.session.add(new_user)
-        db.session.commit()
-        login_user(new_user, remember=True)
 
-        return 'User successfully created.', 201
+    new_user = User(email=form.email.data, password=generate_password_hash(form.password.data, method='sha256'))
+    db.session.add(new_user)
+    db.session.commit()
+    login_user(new_user, remember=True)
+
+    return 'User successfully created.', 201
 
 
 @auth.route("/logout", methods=['POST'])

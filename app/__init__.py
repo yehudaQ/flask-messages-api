@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from os import path, remove
+from os import path
 from flask_login import LoginManager
 
 from app.core.utils import get_configs_as_dictionary

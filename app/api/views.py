@@ -1,5 +1,4 @@
 from flask import Blueprint
-from flask_login import login_required
 from werkzeug.security import generate_password_hash
 
 from app import db
