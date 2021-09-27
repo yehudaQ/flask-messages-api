@@ -127,5 +127,3 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-/TODO.txt
-/app/messages.db

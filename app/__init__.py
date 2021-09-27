@@ -30,7 +30,7 @@ def create_app():
     from app.models.message import Message
     from app.models.receivedMessage import ReceivedMessage
 
-    create_database(app)
+    # create_database(app)
 
     login_manager = LoginManager()
     login_manager.init_app(app)
