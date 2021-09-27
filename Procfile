@@ -1,1 +1,1 @@
-web: gunicorn app:messages_app
+web: gunicorn main:messages_app
