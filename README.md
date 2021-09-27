@@ -26,16 +26,16 @@ API capabilities:
 - Retrieve logged in user.
 - logout.
 - Post message.
-- Retrieve user's sent messages.
 - Read message - Mark message status as 'read' .
-- Unread message - Mark message status as 'unread' .
+- Unread a message - Mark message status as 'unread' .
 - Retrieve message - Retrieve message data.
-- Retrieve user's received messages
-- Retrieve user's unread messages.
-- Retrieve user's read messages.
-- Delete message.
+- Retrieve user's received messages - including 'pagination' capability.
+- Retrieve user's sent messages - including 'pagination' capability.
+- Retrieve user's unread messages - including 'pagination' capability.
+- Retrieve user's read messages - including 'pagination' capability.
+- Delete a message.
 
-<br><br> Please note the request to delete a message:<br>
+<br><br> Please note the request for delete a message:<br>
 
 - If the DELETE request is sent by the user who received the message, the message will be deleted only for him.<br>
 - If the DELETE request is sent by the user who sent the message, the message will be deleted both for him and for the
