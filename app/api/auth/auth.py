@@ -17,7 +17,6 @@ def login():
         email = request.form.get("email")
         password = request.form.get("password")
         user = User.query.filter_by(email=email).first()
-        print(user)
         if user:
             if check_password_hash(user.password, password):
                 login_user(user, remember=True)
@@ -50,7 +49,7 @@ def sign_up():
         return 'User successfully created.', 201
 
 
-@auth.route("/logout", methods=['GET'])
+@auth.route("/logout", methods=['POST'])
 @login_required
 def logout():
     logout_user()

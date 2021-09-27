@@ -10,44 +10,34 @@ from app.models.user import User
 message = Blueprint("message", __name__)
 
 
-@message.route("/message", methods=['GET', 'POST'])
+@message.route("/message", methods=['POST'])
 @login_required
-def messages():
-    if request.method == 'POST':
-        form = MessageForm(request.form)
-        if not form.validate():
-            return form.errors, 403
+def post_message():
+    form = MessageForm(request.form)
+    if not form.validate():
+        return form.errors, 403
 
-        receiver = User.query.filter_by(email=form.receiver_email.data).first()
+    receiver = User.query.filter_by(email=form.receiver_email.data).first()
 
-        if not receiver:
-            return 'Receiver Email is not exists.', 403
+    if not receiver:
+        return 'Receiver Email is not exists.', 403
 
-        new_message = Message(message=form.message.data, subject=form.subject.data, sender_id=current_user.id)
-        db.session.add(new_message)
-        db.session.commit()
+    new_message = Message(message=form.message.data, subject=form.subject.data, sender_id=current_user.id)
+    db.session.add(new_message)
+    db.session.commit()
 
-        received_message = ReceivedMessage(message_id=new_message.id, receiver_id=receiver.id)
-        db.session.add(received_message)
-        db.session.commit()
+    received_message = ReceivedMessage(message_id=new_message.id, receiver_id=receiver.id)
+    db.session.add(received_message)
+    db.session.commit()
 
-        return 'Message successfully created.', 201
-
-    # GET method - Retrieve all user's received messages
-    page = int(request.form.get("page", 1))
-    per_page = int(request.form.get("per_page", 10))
-    received_messages = ReceivedMessage.query.filter_by(receiver_id=current_user.id).paginate(page=page,
-                                                                                              per_page=per_page,
-                                                                                              error_out=False).items
-
-    return jsonify([received.message.serialize for received in received_messages]), 200
+    return 'Message successfully created.', 201
 
 
 @message.route("/message/sent", methods=['GET'])
 @login_required
 def get_sent_messages():
-    page = int(request.form.get("page", 1))
-    per_page = int(request.form.get("per_page", 10))
+    page = int(request.args.get("page", 1))
+    per_page = int(request.args.get("per_page", 10))
     sent_messages = Message.query.filter_by(sender_id=current_user.id).paginate(page=page, per_page=per_page,
                                                                                 error_out=False).items
 
@@ -117,8 +107,8 @@ def get_or_delete_message(message_id):
 @message.route("/message/unread", methods=['GET'])
 @login_required
 def get_unread_messages():
-    page = int(request.form.get("page", 1))
-    per_page = int(request.form.get("per_page", 10))
+    page = int(request.args.get("page", 1))
+    per_page = int(request.args.get("per_page", 10))
     received_messages = ReceivedMessage.query.filter_by(receiver_id=current_user.id, is_read=False).paginate(page=page,
                                                                                                              per_page=per_page,
                                                                                                              error_out=False).items
@@ -129,10 +119,22 @@ def get_unread_messages():
 @message.route("/message/read", methods=['GET'])
 @login_required
 def get_read_messages():
-    page = int(request.form.get("page", 1))
-    per_page = int(request.form.get("per_page", 10))
+    page = int(request.args.get("page", 1))
+    per_page = int(request.args.get("per_page", 10))
     received_messages = ReceivedMessage.query.filter_by(receiver_id=current_user.id, is_read=True).paginate(page=page,
                                                                                                             per_page=per_page,
                                                                                                             error_out=False).items
 
     return jsonify([msg.message.serialize for msg in received_messages]), 200
+
+
+@message.route("/messages", methods=['GET'])
+@login_required
+def get_received_messages():
+    page = int(request.args.get("page", 1))
+    per_page = int(request.args.get("per_page", 10))
+    received_messages = ReceivedMessage.query.filter_by(receiver_id=current_user.id).paginate(page=page,
+                                                                                              per_page=per_page,
+                                                                                              error_out=False).items
+
+    return jsonify([received.message.serialize for received in received_messages]), 200
