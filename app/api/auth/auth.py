@@ -12,8 +12,6 @@ auth = Blueprint("auth", __name__)
 
 @auth.route("/login", methods=['GET', 'POST'])
 def login():
-    # TODO : Handle response Status Codes
-    # TODO : Request data format
     if request.method == 'POST':
         form = LoginForm(ImmutableMultiDict(request.get_json()))
         if not form.validate():
